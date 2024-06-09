@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Linq.Expressions;
@@ -19,6 +20,7 @@ namespace JayoPoiyomiPlugin
         public GameObject window;
 
         public MainThreadDispatcher mainThread;
+        public JayoPoiyomiLerpManager lerpManager;
 
         private string[] sep;
         private VNyanHelper _VNyanHelper;
@@ -55,6 +57,7 @@ namespace JayoPoiyomiPlugin
                 string actionName = triggerParts.Length > 0 ? triggerParts[0] : "";
                 string propName = triggerParts.Length > 1 ? triggerParts[1] : "";
                 string args = triggerParts.Length > 2 ? triggerParts[2] : "";
+                int lerpTime = triggerParts.Length > 3 ? Int32.Parse(triggerParts[3]) : 0;
 
                 Debug.Log($"Trigger Details. action: {actionName} | prop: {propName} | args: {args}");
                 switch (actionName)
@@ -63,7 +66,7 @@ namespace JayoPoiyomiPlugin
                         findPoiyomiMaterials(true);
                         break;
                     case "_xjp_setfloat":
-                        setPoiyomiFloat(_VNyanHelper.parseStringArgument(propName), _VNyanHelper.parseFloatArgument(args));
+                        setPoiyomiFloat(_VNyanHelper.parseStringArgument(propName), _VNyanHelper.parseFloatArgument(args), lerpTime);
                         break;
                     case "_xjp_settexscale":
                         string[] tileValues = _VNyanHelper.parseStringArgument(args).Split(new string[] { "," }, StringSplitOptions.None);
@@ -74,7 +77,7 @@ namespace JayoPoiyomiPlugin
                             float y = _VNyanHelper.parseFloatArgument(tileValues[1]);
                             newScaleValue = new Vector2(x, y);
                         }
-                        setPoiyomiTextureScale(_VNyanHelper.parseStringArgument(propName), newScaleValue);
+                        setPoiyomiTextureScale(_VNyanHelper.parseStringArgument(propName), newScaleValue, lerpTime);
                         break;
                     case "_xjp_settexoffset":
                         string[] locValues = _VNyanHelper.parseStringArgument(args).Split(new string[] { "," }, StringSplitOptions.None);
@@ -85,7 +88,7 @@ namespace JayoPoiyomiPlugin
                             float y = _VNyanHelper.parseFloatArgument(locValues[1]);
                             newOffsetValue = new Vector2(x, y);
                         }
-                        setPoiyomiTextureOffset(_VNyanHelper.parseStringArgument(propName), newOffsetValue);
+                        setPoiyomiTextureOffset(_VNyanHelper.parseStringArgument(propName), newOffsetValue, lerpTime);
                         break;
                     case "_xjp_setvector":
                         string[] vecValues = _VNyanHelper.parseStringArgument(args).Split(new string[] { "," }, StringSplitOptions.None);
@@ -103,10 +106,10 @@ namespace JayoPoiyomiPlugin
                         {
                             newVectorValue.w = _VNyanHelper.parseFloatArgument(vecValues[3]);
                         }
-                        setPoiyomiVector(_VNyanHelper.parseStringArgument(propName), newVectorValue);
+                        setPoiyomiVector(_VNyanHelper.parseStringArgument(propName), newVectorValue, lerpTime);
                         break;
                     case "_xjp_setint":
-                        setPoiyomiInt(_VNyanHelper.parseStringArgument(propName), (int)_VNyanHelper.parseFloatArgument(args));
+                        setPoiyomiInt(_VNyanHelper.parseStringArgument(propName), (int)_VNyanHelper.parseFloatArgument(args), lerpTime);
                         break;
                     case "_xjp_setcolor":
                         string[] colorValues = _VNyanHelper.parseStringArgument(args).Split(new string[] { "," }, StringSplitOptions.None);
@@ -119,14 +122,14 @@ namespace JayoPoiyomiPlugin
                             newColorValue.a = _VNyanHelper.parseFloatArgument(colorValues[3]);
                         }
 
-                        setPoiyomiColor(_VNyanHelper.parseStringArgument(propName), newColorValue);
+                        setPoiyomiColor(_VNyanHelper.parseStringArgument(propName), newColorValue, lerpTime);
                         break;
                     case "_xjp_setcolorhex":
                         Color newHexColorValue = new Color();
 
                         ColorUtility.TryParseHtmlString(_VNyanHelper.parseStringArgument(args), out newHexColorValue);
 
-                        setPoiyomiColor(_VNyanHelper.parseStringArgument(propName), newHexColorValue);
+                        setPoiyomiColor(_VNyanHelper.parseStringArgument(propName), newHexColorValue, lerpTime);
                         break;
                     default:
                         break;
@@ -138,67 +141,112 @@ namespace JayoPoiyomiPlugin
             
         }
 
-        private void setPoiyomiFloat(string propName, float? newValue)
+        public void setPoiyomiFloat(string propName, float newValue, int? lerpTime)
         {
             //Debug.Log($"Setting Poiyomi Float Value for {propName} to {newValue}");
             if (newValue == null) return;
             findPoiyomiMaterials();
             foreach(Material material in materials)
             {
-                material.SetFloat(propName, (float)newValue);
+                if (lerpTime > 0)
+                {
+                    lerpManager.startLerp(propName, material.GetFloat(propName), newValue, (float)lerpTime);
+                } else
+                {
+                    material.SetFloat(propName, (float)newValue);
+                }
+                    
             }
         }
 
-        private void setPoiyomiInt(string propName, int? newValue)
+        public void setPoiyomiInt(string propName, int newValue, int? lerpTime)
         {
             //Debug.Log($"Setting Poiyomi Int Value for {propName} to {newValue}");
             if (newValue == null) return;
             findPoiyomiMaterials();
             foreach (Material material in materials)
             {
-                material.SetInt(propName, (int)newValue);
+                if (lerpTime > 0)
+                {
+                    lerpManager.startLerp(propName, material.GetInt(propName), newValue, (float)lerpTime);
+                }
+                else
+                {
+                    material.SetInt(propName, (int)newValue);
+                }
             }
         }
 
-        private void setPoiyomiColor(string propName, Color? newValue)
+        public void setPoiyomiColor(string propName, Color newValue, int? lerpTime)
         {
             //Debug.Log($"Setting Poiyomi Color Value for {propName} to {newValue.ToString()}");
             if (newValue == null) return;
             findPoiyomiMaterials();
             foreach (Material material in materials)
             {
-                material.SetColor(propName, (Color)newValue);
+                if (lerpTime > 0)
+                {
+                    lerpManager.startLerp(propName, material.GetColor(propName), newValue, (float)lerpTime);
+                }
+                else
+                {
+                    material.SetColor(propName, (Color)newValue);
+                }
+                
             }
         }
 
-        private void setPoiyomiVector(string propName, Vector4 newValue)
+        public void setPoiyomiVector(string propName, Vector4 newValue, int? lerpTime)
         {
             //Debug.Log($"Setting Poiyomi Vector Value for {propName} to {newValue.x}, {newValue.y}, {newValue.z}, {newValue.w},");
             if (newValue == null) return;
             findPoiyomiMaterials();
             foreach (Material material in materials)
             {
-                material.SetVector(propName, newValue);
+                if (lerpTime > 0)
+                {
+                    lerpManager.startLerp(propName, material.GetVector(propName), newValue, (float)lerpTime);
+                }
+                else
+                {
+                    material.SetVector(propName, newValue);
+                }
+                
             }
         }
 
-        private void setPoiyomiTextureScale(string propName, Vector2 newValue)
+        public void setPoiyomiTextureScale(string propName, Vector2 newValue, int? lerpTime)
         {
             //Debug.Log($"Setting Poiyomi texture Tiling Value for {propName} to {newValue.x}, {newValue.y}");
             findPoiyomiMaterials();
             foreach (Material material in materials)
             {
-                material.SetTextureScale(propName, newValue);
+                if (lerpTime > 0)
+                {
+                    lerpManager.startLerp(propName, "scale", material.GetTextureScale(propName), newValue, (float)lerpTime);
+                }
+                else
+                {
+                    material.SetTextureScale(propName, newValue);
+                }
+                
             }
         }
 
-        private void setPoiyomiTextureOffset(string propName, Vector2 newValue)
+        public void setPoiyomiTextureOffset(string propName, Vector2 newValue, int? lerpTime)
         {
             //Debug.Log($"Setting Poiyomi texture Offset Value for {propName} to {newValue.x} , {newValue.y}");
             findPoiyomiMaterials();
             foreach (Material material in materials)
             {
-                material.SetTextureOffset(propName, newValue);
+                if (lerpTime > 0)
+                {
+                    lerpManager.startLerp(propName, "offset", material.GetTextureOffset(propName), newValue, (float)lerpTime);
+                }
+                else
+                {
+                    material.SetTextureOffset(propName, newValue);
+                }
             }
         }
 
@@ -211,12 +259,15 @@ namespace JayoPoiyomiPlugin
                 if (avatar == lastAvatar) return;
             }
             lastAvatar = avatar;
+
             materials = new List<Material>();
             propData = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
-            foreach (Renderer renderer in avatar.GetComponentsInChildren<Renderer>(true))
-            {
+
+            foreach (Renderer renderer in GameObject.FindObjectsOfType<Renderer>(true))
+            {   
                 foreach (Material material in renderer.sharedMaterials)
                 {
+                    //Debug.Log($"Checking Material {material.name}");
                     if (material == null) continue;
                     if (materials.Contains(material)) continue;
                     if (material.shader.name.StartsWith(".poiyomi/") || material.shader.name.StartsWith("Hidden/Locked/.poiyomi/"))
@@ -228,6 +279,7 @@ namespace JayoPoiyomiPlugin
                     }
                 }
             }
+
             PropertiesList.PropData = propData;
             PropertiesList.RebuildList();
         }
@@ -276,6 +328,8 @@ namespace JayoPoiyomiPlugin
             Debug.Log($"Beginning Plugin Setup");
 
             mainThread = gameObject.AddComponent<MainThreadDispatcher>();
+            lerpManager = gameObject.AddComponent<JayoPoiyomiLerpManager>();
+            lerpManager.plugin = this;
             _VNyanHelper.registerTriggerListener(this);
             
             try
