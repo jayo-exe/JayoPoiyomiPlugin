@@ -12,6 +12,7 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
         private VNyanTestParameter _instance;
         private Dictionary<string, string> VNyanStringParameters = new Dictionary<string, string>();
         private Dictionary<string, float> VNyanFloatParameters = new Dictionary<string, float>();
+        private Dictionary<string, Dictionary<string,string>> VNyanDictionaries = new Dictionary<string, Dictionary<string, string>>();
 
         private void Awake()
         {
@@ -68,6 +69,19 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
         {
             //need to learn the expected output for this
             return "";
+        }
+
+        public string GetDictionaryValue(string dictionaryName, string valueName)
+        {
+            if (!VNyanDictionaries.ContainsKey(dictionaryName)) return "";
+            if (!VNyanDictionaries[dictionaryName].ContainsKey(valueName)) return "";
+            return VNyanDictionaries[dictionaryName][valueName];
+        }
+
+        public void SetDictionaryValue(string dictionaryName, string valueName, string newValue)
+        {
+            if (!VNyanDictionaries.ContainsKey(dictionaryName)) VNyanDictionaries.Add(dictionaryName, new Dictionary<string,string>());
+            VNyanDictionaries[dictionaryName][valueName] = newValue;
         }
 
     }

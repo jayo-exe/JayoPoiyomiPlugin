@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace JayoPoiyomiPlugin
+namespace JayoPoiyomiPlugin.LerpManager
 {
-    class FloatLerpItem : ILerpItem
+    class Vector4LerpItem: ILerpItem
     {
         public JayoPoiyomiPlugin plugin { get; set; }
         public string propertyName { get; set; }
         public float lerpTime { get; set; }
         public float currentLerpTime { get; set; }
 
-        public float startValue { get; set; }
-        public float currentValue { get; set; }
-        public float targetValue { get; set; }
+        public Vector4 startValue { get; set; }
+        public Vector4 currentValue { get; set; }
+        public Vector4 targetValue { get; set; }
 
         public void DoLerp()
         {
             float lerpFactor = Math.Min((currentLerpTime / lerpTime), 1.0f);
-            currentValue = Mathf.Lerp(startValue, targetValue, lerpFactor);
-            plugin.setPoiyomiFloat(propertyName, currentValue, 0);
+            currentValue = Vector4.Lerp(startValue, targetValue, lerpFactor);
+            plugin.setPoiyomiVector(propertyName, currentValue, 0);
         }
     }
 }

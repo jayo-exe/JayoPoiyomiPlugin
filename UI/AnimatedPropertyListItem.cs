@@ -4,9 +4,9 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace JayoPoiyomiPlugin
+namespace JayoPoiyomiPlugin.UI
 {
-    class AnimatedPropertyListItem : MonoBehaviour
+    public class AnimatedPropertyListItem : MonoBehaviour
     {
         public GameObject nameTextObject;
         public GameObject typeTextObject;

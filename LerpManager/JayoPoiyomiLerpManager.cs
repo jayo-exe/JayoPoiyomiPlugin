@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 
-namespace JayoPoiyomiPlugin
+namespace JayoPoiyomiPlugin.LerpManager
 {
     public class JayoPoiyomiLerpManager : MonoBehaviour
     {

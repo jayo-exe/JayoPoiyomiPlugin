@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using System.Linq.Expressions;
 using VNyanInterface;
 using JayoPoiyomiPlugin.VNyanPluginHelper;
+using JayoPoiyomiPlugin.UI;
+using JayoPoiyomiPlugin.LerpManager;
 
 namespace JayoPoiyomiPlugin
 {
@@ -21,6 +23,8 @@ namespace JayoPoiyomiPlugin
 
         public MainThreadDispatcher mainThread;
         public JayoPoiyomiLerpManager lerpManager;
+
+        public Dictionary<string, string> HexToDec;
 
         private string[] sep;
         private VNyanHelper _VNyanHelper;
@@ -33,6 +37,9 @@ namespace JayoPoiyomiPlugin
         private GameObject instructionsButton;
         private GameObject propertyListTab;
         private GameObject propertyListButton;
+        private GameObject propertyListSearch;
+        private GameObject propertyListFilter;
+        private GameObject propertyListRefetch;
 
 
         public void Start()
@@ -341,13 +348,21 @@ namespace JayoPoiyomiPlugin
                 Debug.Log(e.ToString());
             }
 
-
+            HexToDec = Enumerable.Range(0, 256).ToDictionary( i => i.ToString("X2"), i => i.ToString());
+            foreach(KeyValuePair<string,string> hex in HexToDec)
+            {
+                _VNyanHelper.setVNyanDictionaryValue("HexToDec", hex.Key, hex.Value);
+                _VNyanHelper.setVNyanDictionaryValue("DecToHex", hex.Value, hex.Key);
+            }
 
             // Hide the window by default
             if (window != null)
             {
                 propertyListButton = window.transform.Find("Panel/PropertiesButton").gameObject;
                 propertyListTab = window.transform.Find("Panel/PropertiesPanel").gameObject;
+                propertyListSearch = window.transform.Find("Panel/PropertiesPanel/SearchField").gameObject;
+                propertyListFilter = window.transform.Find("Panel/PropertiesPanel/FilterField").gameObject;
+                propertyListRefetch = window.transform.Find("Panel/PropertiesPanel/RefetchButton").gameObject;
                 instructionsButton = window.transform.Find("Panel/InstructionsButton").gameObject;
                 instructionsTab = window.transform.Find("Panel/InstructionsPanel").gameObject;
                 window.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
@@ -361,6 +376,15 @@ namespace JayoPoiyomiPlugin
                     propertyListButton.GetComponent<Button>().onClick.AddListener(() => { tabToPropertyList(); });
                     instructionsButton.GetComponent<Button>().onClick.AddListener(() => { tabToInstructions(); });
                     PropertiesList = window.transform.Find("Panel/PropertiesPanel/Scroll View/Viewport/PropertiesLayoutGroup").gameObject.GetComponent<AnimatedPropertiesList>();
+                    propertyListSearch.GetComponent<InputField>().onValueChanged.AddListener((v) => { PropertiesList.SearchTerm = v; PropertiesList.RebuildList(); });
+                    propertyListRefetch.GetComponent<Button>().onClick.AddListener(() => { findPoiyomiMaterials(true); });
+
+                    Dropdown filterDropdown = propertyListFilter.GetComponent<Dropdown>();
+                    filterDropdown.onValueChanged.AddListener((v) => {
+                        PropertiesList.TypeFilter = (v == 0) ? "" : filterDropdown.options[v].text;
+                        PropertiesList.RebuildList();
+                    });
+
                     findPoiyomiMaterials();
                     tabToPropertyList();
                 }

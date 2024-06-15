@@ -11,12 +11,15 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
     {
         private VNyanTestHarness testHarness;
         private GameObject testCanvasObject;
+        private VNyanTestParameter parameterSystem;
+        public bool inVNyan { get; }
 
         public VNyanHelper()
         {
+            inVNyan = true;
             if ((VNyanInterface.VNyanInterface.VNyanParameter == null))
             {
-
+                inVNyan = false;
                 DefaultControls.Resources uiResources = new DefaultControls.Resources();
                 foreach (Sprite sprite in Resources.FindObjectsOfTypeAll<Sprite>())
                 {
@@ -48,7 +51,7 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
 
                 if (GameObject.FindObjectOfType<VNyanTestParameter>() == null)
                 {
-                    VNyanTestParameter parameterSystem = harnessObject.AddComponent<VNyanTestParameter>();
+                    parameterSystem = harnessObject.AddComponent<VNyanTestParameter>();
                     VNyanInterface.VNyanInterface.VNyanParameter = parameterSystem;
                 }
 
@@ -163,6 +166,24 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
             return null;
 
 
+        }
+
+        public string getVNyanDictionaryValue(string dictionaryName, string valueName)
+        {
+            if (!inVNyan)
+            {
+                return parameterSystem.GetDictionaryValue(dictionaryName, valueName);
+            }
+            return ParamSystem.getInstance().GetDictionaryValue(dictionaryName, valueName);
+        }
+
+        public void setVNyanDictionaryValue(string dictionaryName, string valueName, string newValue)
+        {
+            if (!inVNyan)
+            {
+                parameterSystem.SetDictionaryValue(dictionaryName, valueName, newValue);
+            }
+            ParamSystem.getInstance().SetDictionaryValue(dictionaryName, valueName, newValue);
         }
 
         public GameObject getAvatarObject()
