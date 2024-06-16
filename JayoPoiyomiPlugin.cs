@@ -71,7 +71,7 @@ namespace JayoPoiyomiPlugin
             
             try
             {
-                window = _VNyanHelper.pluginSetup(this, "Jayo's Poiyomi Plugin", windowPrefab);
+                window = _VNyanHelper.pluginSetup(this, "Jayo's Poiyomi Shader Plugin", windowPrefab);
             }
             catch (Exception e)
             {
