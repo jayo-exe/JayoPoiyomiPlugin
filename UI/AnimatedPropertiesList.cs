@@ -11,7 +11,7 @@ namespace JayoPoiyomiPlugin.UI
         public GameObject MaterialItemPrefab;
         public GameObject ListItemPrefab;
 
-        public Dictionary<string, Dictionary<string, Dictionary<string, string>>> PropData;
+        public ShaderPropertyListData PropData;
         public string SearchTerm = "";
         public string TypeFilter = "";
 
@@ -35,12 +35,12 @@ namespace JayoPoiyomiPlugin.UI
         {
             ClearList();
             
-            foreach (KeyValuePair<string, Dictionary<string, Dictionary<string, string>>> materialItem in PropData)
+            foreach (KeyValuePair<string, ShaderPropertyListItem> materialItem in PropData)
             {
                 bool addedMaterialItem = false;
                 GameObject matLabel = null;
 
-                foreach (KeyValuePair< string, Dictionary<string, string>> propertyItem in materialItem.Value)
+                foreach (KeyValuePair< string, ShaderPropertyDetails> propertyItem in materialItem.Value)
                 {
                     if (SearchTerm != "" && !propertyItem.Value["name"].ToLowerInvariant().Contains(SearchTerm.ToLowerInvariant())) continue;
                     if (TypeFilter != "" && propertyItem.Value["type"] != TypeFilter) continue;

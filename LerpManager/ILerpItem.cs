@@ -7,7 +7,6 @@ namespace JayoPoiyomiPlugin.LerpManager
 {
     interface ILerpItem
     {
-        JayoPoiyomiPlugin plugin { get; set; }
         string propertyName {get; set;}
         float lerpTime { get; set; }
         float currentLerpTime { get; set; }

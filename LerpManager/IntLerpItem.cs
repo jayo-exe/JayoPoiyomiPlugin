@@ -7,7 +7,8 @@ namespace JayoPoiyomiPlugin.LerpManager
 {
     class IntLerpItem : ILerpItem
     {
-        public JayoPoiyomiPlugin plugin { get; set; }
+        public event Action<string, int, int> LerpCalculated;
+
         public string propertyName { get; set; }
         public float lerpTime { get; set; }
         public float currentLerpTime { get; set; }
@@ -20,7 +21,7 @@ namespace JayoPoiyomiPlugin.LerpManager
         {
             float lerpFactor = Math.Min((currentLerpTime / lerpTime), 1.0f);
             currentValue = Mathf.RoundToInt(Mathf.Lerp(startValue, targetValue, lerpFactor));
-            plugin.setPoiyomiInt(propertyName, currentValue, 0);
+            LerpCalculated.Invoke(propertyName, currentValue, 0);
         }
     }
 }

@@ -170,20 +170,28 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
 
         public string getVNyanDictionaryValue(string dictionaryName, string valueName)
         {
-            if (!inVNyan)
+            try
             {
+                return ParamSystem.getInstance().GetDictionaryValue(dictionaryName, valueName);
+            } catch(Exception e)
+            {
+                Debug.LogWarning(e.Message);
                 return parameterSystem.GetDictionaryValue(dictionaryName, valueName);
             }
-            return ParamSystem.getInstance().GetDictionaryValue(dictionaryName, valueName);
+            
         }
 
         public void setVNyanDictionaryValue(string dictionaryName, string valueName, string newValue)
         {
-            if (!inVNyan)
+            try
             {
+                ParamSystem.getInstance().SetDictionaryValue(dictionaryName, valueName, newValue);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e.Message);
                 parameterSystem.SetDictionaryValue(dictionaryName, valueName, newValue);
             }
-            ParamSystem.getInstance().SetDictionaryValue(dictionaryName, valueName, newValue);
         }
 
         public GameObject getAvatarObject()

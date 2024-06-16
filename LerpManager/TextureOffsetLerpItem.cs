@@ -7,7 +7,7 @@ namespace JayoPoiyomiPlugin.LerpManager
 {
     class TextureOffsetLerpItem : ILerpItem
     {
-        public JayoPoiyomiPlugin plugin { get; set; }
+        public event Action<string, Vector2, int> LerpCalculated;
         public string propertyName { get; set; }
         public float lerpTime { get; set; }
         public float currentLerpTime { get; set; }
@@ -19,7 +19,7 @@ namespace JayoPoiyomiPlugin.LerpManager
         {
             float lerpFactor = Math.Min((currentLerpTime / lerpTime), 1.0f);
             currentValue = Vector2.Lerp(startValue, targetValue, lerpFactor);
-            plugin.setPoiyomiTextureOffset(propertyName, currentValue, 0);
+            LerpCalculated.Invoke(propertyName, currentValue, 0);
         }
     }
 
