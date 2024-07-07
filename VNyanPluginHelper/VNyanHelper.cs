@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -234,10 +235,19 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
         {
             if (arg.StartsWith("[") && arg.EndsWith("]"))
             {
+                //float param, just get and return the value directly
                 return getVNyanParameterFloat(arg.Substring(1, arg.Length - 2));
             }
+
+            if (arg.StartsWith("<") && arg.EndsWith(">"))
+            {
+                //string param, set arg to the value from the parameters list before parsing
+                arg = getVNyanParameterString(arg.Substring(1, arg.Length - 2));
+            }
+
+            //parse the value of arg into a float
             float returnVal = 0f;
-            float.TryParse(arg, out returnVal);
+            float.TryParse(arg, NumberStyles.Any, CultureInfo.InvariantCulture, out returnVal);
             return returnVal;
         }
 
