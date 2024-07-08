@@ -17,7 +17,8 @@ namespace JayoPoiyomiPlugin.LerpManager
         public event Action<string, Vector2, int> TextureScaleLerpCalculated;
         public event Action<string, Vector2, int> TextureOffsetLerpCalculated;
 
-        private List<ILerpItem> activeLerps = new List<ILerpItem>();
+        private List<string> finishedLerps = new List<string>();
+        private Dictionary<string, ILerpItem> propertyLerps = new Dictionary<string, ILerpItem>();
 
         public void startLerp(string propertyName, int startValue, int targetValue, float lerpTime)
         {
@@ -31,7 +32,7 @@ namespace JayoPoiyomiPlugin.LerpManager
                 currentLerpTime = 0f
             };
             item.LerpCalculated += (p, v, l) => IntLerpCalculated.Invoke(p, v, l);
-            activeLerps.Add(item);
+            propertyLerps[propertyName] = item;
         }
 
         public void startLerp(string propertyName, float startValue, float targetValue, float lerpTime)
@@ -46,7 +47,8 @@ namespace JayoPoiyomiPlugin.LerpManager
                 currentLerpTime = 0f
             };
             item.LerpCalculated += (p, v, l) => FloatLerpCalculated.Invoke(p, v, l);
-            activeLerps.Add(item);
+            item.LerpCalculated += (p, v, l) => Debug.Log($"new Lerp value of {v} calculated for property {p}. Start: {startValue} Target: {targetValue} Time: {lerpTime}");
+            propertyLerps[propertyName] = item;
         }
 
         public void startLerp(string propertyName, Color startValue, Color targetValue, float lerpTime)
@@ -61,7 +63,7 @@ namespace JayoPoiyomiPlugin.LerpManager
                 currentLerpTime = 0f
             };
             item.LerpCalculated += (p, v, l) => ColorLerpCalculated.Invoke(p, v, l);
-            activeLerps.Add(item);
+            propertyLerps[propertyName] = item;
         }
 
         public void startLerp(string propertyName, string subType, Vector2 startValue, Vector2 targetValue, float lerpTime)
@@ -78,7 +80,7 @@ namespace JayoPoiyomiPlugin.LerpManager
                     currentLerpTime = 0f
                 };
                 item.LerpCalculated += (p, v, l) => TextureScaleLerpCalculated.Invoke(p, v, l);
-                activeLerps.Add(item);
+                propertyLerps[propertyName] = item;
             } else if (subType == "offset")
             {
                 TextureOffsetLerpItem item = new TextureOffsetLerpItem()
@@ -91,7 +93,7 @@ namespace JayoPoiyomiPlugin.LerpManager
                     currentLerpTime = 0f
                 };
                 item.LerpCalculated += (p, v, l) => TextureOffsetLerpCalculated.Invoke(p, v, l);
-                activeLerps.Add(item);
+                propertyLerps[propertyName] = item;
             }
             
             
@@ -109,26 +111,39 @@ namespace JayoPoiyomiPlugin.LerpManager
                 currentLerpTime = 0f
             };
             item.LerpCalculated += (p, v, l) => Vector4LerpCalculated.Invoke(p, v, l);
-            activeLerps.Add(item);
+            propertyLerps[propertyName] = item;
         }
 
         private void checkLerps()
         {
-            List<ILerpItem> remainingLerps = new List<ILerpItem>();
-            foreach (ILerpItem lerpItem in activeLerps)
+            if (propertyLerps.Count == 0) return;
+
+            foreach (KeyValuePair<string, ILerpItem> lerpItem in propertyLerps)
             {
-                lerpItem.currentLerpTime += (Time.deltaTime * 1000);
-                lerpItem.DoLerp();
-                if (lerpItem.currentLerpTime >= lerpItem.lerpTime)
+                lerpItem.Value.currentLerpTime += (Time.deltaTime * 1000);
+                lerpItem.Value.DoLerp();
+                if (lerpItem.Value.currentLerpTime >= lerpItem.Value.lerpTime)
                 {
-                    activeLerps.Remove(lerpItem);
+                    finishedLerps.Add(lerpItem.Key);
                 }
             }
+        }
+
+        private void clearFinishedLerps()
+        {
+            if (finishedLerps.Count == 0) return;
+
+            foreach(string lerpKey in finishedLerps)
+            {
+                propertyLerps.Remove(lerpKey);
+            }
+            finishedLerps = new List<string>();
         }
 
         public void Update()
         {
             checkLerps();
+            clearFinishedLerps();
         }
     }
 }

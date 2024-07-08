@@ -158,7 +158,7 @@ namespace JayoPoiyomiPlugin
 
         public void setPoiyomiFloat(string propName, float newValue, int lerpTime)
         {
-            //Debug.Log($"Setting Poiyomi Float Value for {propName} to {newValue}");
+            Debug.Log($"Setting Poiyomi Float Value for {propName} to {newValue} over {lerpTime}ms");
             if (newValue == null) return;
             findPoiyomiMaterials();
             foreach (Material material in materials)

@@ -38,7 +38,7 @@ namespace JayoPoiyomiPlugin
         private GameObject propertyListFilter;
         private GameObject propertyListRefetch;
 
-        private string currentVersion = "v1.0.0";
+        private string currentVersion = "v1.1.0";
         private string repoName = "jayo-exe/JayoPoiyomiPlugin";
 
         private void OnApplicationQuit()
