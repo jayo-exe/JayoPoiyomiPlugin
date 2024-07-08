@@ -70,7 +70,7 @@ namespace JayoPoiyomiPlugin
                 string args = triggerParts.Length > 2 ? triggerParts[2] : "";
                 int lerpTime = triggerParts.Length > 3 ? Int32.Parse(triggerParts[3]) : 0;
 
-                Debug.Log($"Trigger Details. action: {actionName} | prop: {propName} | args: {args}");
+                //Debug.Log($"Trigger Details. action: {actionName} | prop: {propName} | args: {args}");
                 switch (actionName)
                 {
                     case "_xjp_refetch":
@@ -158,7 +158,7 @@ namespace JayoPoiyomiPlugin
 
         public void setPoiyomiFloat(string propName, float newValue, int lerpTime)
         {
-            Debug.Log($"Setting Poiyomi Float Value for {propName} to {newValue} over {lerpTime}ms");
+            //Debug.Log($"Setting Poiyomi Float Value for {propName} to {newValue} over {lerpTime}ms");
             if (newValue == null) return;
             findPoiyomiMaterials();
             foreach (Material material in materials)
@@ -306,10 +306,10 @@ namespace JayoPoiyomiPlugin
             int propertyCount = shader.GetPropertyCount();
             for (int i = 0; i <= propertyCount - 1; i++)
             {
-                Debug.Log($"Checking shader property {shader.GetPropertyName(i)} | {shader.GetPropertyDescription(i).Split(new String[] { "--" }, StringSplitOptions.None)[0]} ({shader.GetPropertyType(i)})");
+                //Debug.Log($"Checking shader property {shader.GetPropertyName(i)} | {shader.GetPropertyDescription(i).Split(new String[] { "--" }, StringSplitOptions.None)[0]} ({shader.GetPropertyType(i)})");
                 if (shader.GetPropertyName(i).EndsWith(material.name.Replace(" ","")))
                 {
-                    Debug.Log($"Found shader renamed property {shader.GetPropertyName(i)} | {shader.GetPropertyDescription(i).Split(new String[] { "--" }, StringSplitOptions.None)[0]} ({shader.GetPropertyType(i)})");
+                    //Debug.Log($"Found shader renamed property {shader.GetPropertyName(i)} | {shader.GetPropertyDescription(i).Split(new String[] { "--" }, StringSplitOptions.None)[0]} ({shader.GetPropertyType(i)})");
                     int nameId = shader.GetPropertyNameId(i);
                     parameterList.Add(shader.GetPropertyName(i));
                     propData[$"{material.name} ({material.GetInstanceID()})"].Add(shader.GetPropertyName(i), new ShaderPropertyDetails
@@ -321,7 +321,7 @@ namespace JayoPoiyomiPlugin
                 }
                 else if (material.GetTag($"{shader.GetPropertyName(i)}Animated", false, "") != "")
                 {
-                    Debug.Log($"Found animated shader property [{shader.GetPropertyFlags(i)}] {shader.GetPropertyName(i)} | {shader.GetPropertyDescription(i).Split(new String[] { "--" }, StringSplitOptions.None)[0]} ({shader.GetPropertyType(i)})");
+                    //Debug.Log($"Found animated shader property [{shader.GetPropertyFlags(i)}] {shader.GetPropertyName(i)} | {shader.GetPropertyDescription(i).Split(new String[] { "--" }, StringSplitOptions.None)[0]} ({shader.GetPropertyType(i)})");
                     propData[$"{material.name} ({material.GetInstanceID()})"].Add(shader.GetPropertyName(i), new ShaderPropertyDetails
                     {
                         ["name"] = shader.GetPropertyName(i),

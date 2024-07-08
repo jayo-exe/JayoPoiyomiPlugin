@@ -47,7 +47,6 @@ namespace JayoPoiyomiPlugin.LerpManager
                 currentLerpTime = 0f
             };
             item.LerpCalculated += (p, v, l) => FloatLerpCalculated.Invoke(p, v, l);
-            item.LerpCalculated += (p, v, l) => Debug.Log($"new Lerp value of {v} calculated for property {p}. Start: {startValue} Target: {targetValue} Time: {lerpTime}");
             propertyLerps[propertyName] = item;
         }
 
