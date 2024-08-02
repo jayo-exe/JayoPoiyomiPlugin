@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using VNyanInterface;
 
 namespace JayoPoiyomiPlugin.VNyanPluginHelper
@@ -45,7 +41,7 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
             poseLayers.Add(layer);
         }
 
-        public GameObject getAvatarObject()
+        public object getAvatarObject()
         {
             return avatar;
         }
