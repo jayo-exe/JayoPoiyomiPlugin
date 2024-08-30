@@ -169,6 +169,8 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
 
         }
 
+        //restore this behaviour when officially supported
+        /*
         public string getVNyanDictionaryValue(string dictionaryName, string valueName)
         {
             try
@@ -194,6 +196,7 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
                 parameterSystem.SetDictionaryValue(dictionaryName, valueName, newValue);
             }
         }
+        */
 
         public GameObject getAvatarObject()
         {
