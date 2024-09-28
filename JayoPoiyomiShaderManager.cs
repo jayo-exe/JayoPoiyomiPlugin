@@ -57,10 +57,98 @@ namespace JayoPoiyomiPlugin
             findPoiyomiMaterials();
         }
 
-        public void triggerCalled(string triggerName)
+        public void triggerCalled(string triggerName, int value1, int value2, int value3, string text1, string text2, string text3)
         {
             if (!triggerName.StartsWith("_xjp_")) return;
 
+            //check if this is using the legacy structured trigger names to pass arguments, and pass the the legacy hander if so
+            if(triggerName.Contains(";;"))
+            {
+                handleLegacyTriggers(triggerName);
+                return;
+            }
+
+            switch (triggerName)
+            {
+                case "_xjp_refetch":
+                    findPoiyomiMaterials(true);
+                    break;
+                case "_xjp_setfloat":
+                    setPoiyomiFloat(_VNyanHelper.parseStringArgument(text1), _VNyanHelper.parseFloatArgument(text2), value1);
+                    break;
+                case "_xjp_settexscale":
+                    string[] tileValues = _VNyanHelper.parseStringArgument(text2).Split(new string[] { "," }, StringSplitOptions.None);
+                    Vector2 newScaleValue = new Vector2(1, 1);
+                    if (tileValues.Length == 2)
+                    {
+                        float x = _VNyanHelper.parseFloatArgument(tileValues[0]);
+                        float y = _VNyanHelper.parseFloatArgument(tileValues[1]);
+                        newScaleValue = new Vector2(x, y);
+                    }
+                    setPoiyomiTextureScale(_VNyanHelper.parseStringArgument(text1), newScaleValue, value1);
+                    break;
+                case "_xjp_settexoffset":
+                    string[] locValues = _VNyanHelper.parseStringArgument(text2).Split(new string[] { "," }, StringSplitOptions.None);
+                    Vector2 newOffsetValue = new Vector2(1, 1);
+                    if (locValues.Length == 2)
+                    {
+                        float x = _VNyanHelper.parseFloatArgument(locValues[0]);
+                        float y = _VNyanHelper.parseFloatArgument(locValues[1]);
+                        newOffsetValue = new Vector2(x, y);
+                    }
+                    setPoiyomiTextureOffset(_VNyanHelper.parseStringArgument(text1), newOffsetValue, value1);
+                    break;
+                case "_xjp_setvector":
+                    string[] vecValues = _VNyanHelper.parseStringArgument(text2).Split(new string[] { "," }, StringSplitOptions.None);
+                    Vector4 newVectorValue = new Vector4(0, 0, 0, 0);
+                    if (vecValues.Length >= 2)
+                    {
+                        newVectorValue.x = _VNyanHelper.parseFloatArgument(vecValues[0]);
+                        newVectorValue.y = _VNyanHelper.parseFloatArgument(vecValues[1]);
+                    }
+                    if (vecValues.Length >= 3)
+                    {
+                        newVectorValue.z = _VNyanHelper.parseFloatArgument(vecValues[2]);
+                    }
+                    if (vecValues.Length >= 4)
+                    {
+                        newVectorValue.w = _VNyanHelper.parseFloatArgument(vecValues[3]);
+                    }
+                    setPoiyomiVector(_VNyanHelper.parseStringArgument(text1), newVectorValue, value1);
+                    break;
+                case "_xjp_setint":
+                    setPoiyomiInt(_VNyanHelper.parseStringArgument(text1), (int)_VNyanHelper.parseFloatArgument(text2), value1);
+                    break;
+                case "_xjp_setcolor":
+                    string[] colorValues = _VNyanHelper.parseStringArgument(text2).Split(new string[] { "," }, StringSplitOptions.None);
+                    Color newColorValue = new Color();
+                    if (colorValues.Length >= 3)
+                    {
+                        newColorValue.r = _VNyanHelper.parseFloatArgument(colorValues[0]);
+                        newColorValue.g = _VNyanHelper.parseFloatArgument(colorValues[1]);
+                        newColorValue.b = _VNyanHelper.parseFloatArgument(colorValues[2]);
+                    }
+                    if (colorValues.Length >= 4)
+                    {
+                        newColorValue.a = _VNyanHelper.parseFloatArgument(colorValues[3]);
+                    }
+
+                    setPoiyomiColor(_VNyanHelper.parseStringArgument(text1), newColorValue, value1);
+                    break;
+                case "_xjp_setcolorhex":
+                    Color newHexColorValue = new Color();
+                    ColorUtility.TryParseHtmlString(_VNyanHelper.parseStringArgument(text2), out newHexColorValue);
+
+                    setPoiyomiColor(_VNyanHelper.parseStringArgument(text1), newHexColorValue, value1);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        public void handleLegacyTriggers(string triggerName)
+        {
             try
             {
                 _VNyanHelper.setVNyanParameterString("_xjp_last_trigger", triggerName);
@@ -129,7 +217,7 @@ namespace JayoPoiyomiPlugin
                         {
                             newColorValue.r = _VNyanHelper.parseFloatArgument(colorValues[0]);
                             newColorValue.g = _VNyanHelper.parseFloatArgument(colorValues[1]);
-                            newColorValue.b = _VNyanHelper.parseFloatArgument(colorValues[2]);  
+                            newColorValue.b = _VNyanHelper.parseFloatArgument(colorValues[2]);
                         }
                         if (colorValues.Length >= 4)
                         {
@@ -153,7 +241,6 @@ namespace JayoPoiyomiPlugin
             {
                 Debug.Log($"Unable to process trigger in JayoPoiyomiPlugin: {e.Message} ; {e.StackTrace}");
             }
-
         }
 
         public void setPoiyomiFloat(string propName, float newValue, int lerpTime)

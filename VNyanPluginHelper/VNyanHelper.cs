@@ -18,104 +18,106 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
         public VNyanHelper()
         {
             inVNyan = true;
-            if ((VNyanInterface.VNyanInterface.VNyanParameter == null))
+            if (VNyanInterface.VNyanInterface.VNyanParameter != null) return;
+
+            // VNyan's parameter interface isn't initialized, which means we aren't in VNyan (we're in the Unity editor)
+            // Initialize the emulated VNyanIntreface systems so we can test stuff in-editor
+            inVNyan = false;
+            DefaultControls.Resources uiResources = new DefaultControls.Resources();
+            foreach (Sprite sprite in Resources.FindObjectsOfTypeAll<Sprite>())
             {
-                inVNyan = false;
-                DefaultControls.Resources uiResources = new DefaultControls.Resources();
-                foreach (Sprite sprite in Resources.FindObjectsOfTypeAll<Sprite>())
+                if (sprite.name == "UISprite")
                 {
-                    if (sprite.name == "UISprite")
-                    {
-                        uiResources.standard = sprite;
-                        break;
-                    }
+                    uiResources.standard = sprite;
+                    break;
                 }
-
-                var harnessObject = GameObject.Find("__VNyanTestHarness");
-                if (harnessObject == null)
-                {
-                    Debug.Log($"Instantiating Test Harness");
-                    harnessObject = new GameObject("__VNyanTestHarness");
-
-                }
-
-                if (GameObject.FindObjectOfType<EventSystem>() == null)
-                {
-                    var eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
-                }
-
-                if (GameObject.FindObjectOfType<VNyanTestTrigger>() == null)
-                {
-                    VNyanTestTrigger triggerSystem = harnessObject.AddComponent<VNyanTestTrigger>();
-                    VNyanInterface.VNyanInterface.VNyanTrigger = triggerSystem;
-                }
-
-                if (GameObject.FindObjectOfType<VNyanTestParameter>() == null)
-                {
-                    parameterSystem = harnessObject.AddComponent<VNyanTestParameter>();
-                    VNyanInterface.VNyanInterface.VNyanParameter = parameterSystem;
-                }
-
-                if (GameObject.FindObjectOfType<VNyanTestSettings>() == null)
-                {
-                    VNyanTestSettings settingsSystem = harnessObject.AddComponent<VNyanTestSettings>();
-                    VNyanInterface.VNyanInterface.VNyanSettings = settingsSystem;
-                }
-
-                if (GameObject.FindObjectOfType<VNyanTestUI>() == null)
-                {
-                    VNyanTestUI uiSystem = harnessObject.AddComponent<VNyanTestUI>();
-                    VNyanInterface.VNyanInterface.VNyanUI = uiSystem;
-                }
-
-                VNyanTestAvatar avatarSystem = GameObject.FindObjectOfType<VNyanTestAvatar>();
-                if (avatarSystem == null)
-                {
-                    avatarSystem = harnessObject.AddComponent<VNyanTestAvatar>();      
-                }
-
-                VNyanInterface.VNyanInterface.VNyanAvatar = avatarSystem;
-
-                var canvasObject = GameObject.Find("__VNyanTestHarness/__VNyanTestCanvas");
-                if (canvasObject == null)
-                {
-                    Debug.Log($"Instantiating Test Canvas");
-                    canvasObject = new GameObject("__VNyanTestCanvas");
-                    canvasObject.AddComponent<Canvas>();
-                    Canvas myCanvas = canvasObject.GetComponent<Canvas>();
-                    myCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                    canvasObject.AddComponent<CanvasScaler>();
-                    canvasObject.AddComponent<GraphicRaycaster>();
-                    canvasObject.transform.SetParent(harnessObject.transform);
-
-                    GameObject canvasButtonHolder = DefaultControls.CreatePanel(uiResources);
-                    canvasButtonHolder.name = "__VNyanPluginButtonHolder";
-                    canvasButtonHolder.transform.SetParent(canvasObject.transform);
-
-                    GameObject canvasParameterHolder = DefaultControls.CreatePanel(uiResources);
-                    canvasParameterHolder.name = "__VNyanParameterHolder";
-                    canvasParameterHolder.transform.SetParent(canvasObject.transform);
-                    canvasParameterHolder.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, 12, 468);
-                    canvasParameterHolder.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Right, 12, 240);
-
-                    GameObject stringParameterScroll = DefaultControls.CreateScrollView(uiResources);
-                    stringParameterScroll.name = "__VNyanStringParameterScroll";
-                    stringParameterScroll.transform.SetParent(canvasParameterHolder.transform);
-                    stringParameterScroll.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, 12, 216);
-                    stringParameterScroll.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, 12, 216);
-
-                    GameObject floatParameterScroll = DefaultControls.CreateScrollView(uiResources);
-                    floatParameterScroll.name = "__VNyanFloatParameterScroll";
-                    floatParameterScroll.transform.SetParent(canvasParameterHolder.transform);
-                    floatParameterScroll.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, 240, 216);
-                    floatParameterScroll.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, 12, 216);
-
-                }
-                testCanvasObject = canvasObject;
-
-                harnessObject.AddComponent<VNyanTestHarness>();
-                testHarness = harnessObject.GetComponent<VNyanTestHarness>();
             }
+
+            var harnessObject = GameObject.Find("__VNyanTestHarness");
+            if (harnessObject == null)
+            {
+                Debug.Log($"Instantiating Test Harness");
+                harnessObject = new GameObject("__VNyanTestHarness");
+
+            }
+
+            if (GameObject.FindObjectOfType<EventSystem>() == null)
+            {
+                var eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+            }
+
+            if (GameObject.FindObjectOfType<VNyanTestTrigger>() == null)
+            {
+                VNyanTestTrigger triggerSystem = harnessObject.AddComponent<VNyanTestTrigger>();
+                VNyanInterface.VNyanInterface.VNyanTrigger = triggerSystem;
+            }
+
+            if (GameObject.FindObjectOfType<VNyanTestParameter>() == null)
+            {
+                parameterSystem = harnessObject.AddComponent<VNyanTestParameter>();
+                VNyanInterface.VNyanInterface.VNyanParameter = parameterSystem;
+            }
+
+            if (GameObject.FindObjectOfType<VNyanTestSettings>() == null)
+            {
+                VNyanTestSettings settingsSystem = harnessObject.AddComponent<VNyanTestSettings>();
+                VNyanInterface.VNyanInterface.VNyanSettings = settingsSystem;
+            }
+
+            if (GameObject.FindObjectOfType<VNyanTestUI>() == null)
+            {
+                VNyanTestUI uiSystem = harnessObject.AddComponent<VNyanTestUI>();
+                VNyanInterface.VNyanInterface.VNyanUI = uiSystem;
+            }
+
+            VNyanTestAvatar avatarSystem = GameObject.FindObjectOfType<VNyanTestAvatar>();
+            if (avatarSystem == null)
+            {
+                avatarSystem = harnessObject.AddComponent<VNyanTestAvatar>();      
+            }
+
+            VNyanInterface.VNyanInterface.VNyanAvatar = avatarSystem;
+
+            var canvasObject = GameObject.Find("__VNyanTestHarness/__VNyanTestCanvas");
+            if (canvasObject == null)
+            {
+                Debug.Log($"Instantiating Test Canvas");
+                canvasObject = new GameObject("__VNyanTestCanvas");
+                canvasObject.AddComponent<Canvas>();
+                Canvas myCanvas = canvasObject.GetComponent<Canvas>();
+                myCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvasObject.AddComponent<CanvasScaler>();
+                canvasObject.AddComponent<GraphicRaycaster>();
+                canvasObject.transform.SetParent(harnessObject.transform);
+
+                GameObject canvasButtonHolder = DefaultControls.CreatePanel(uiResources);
+                canvasButtonHolder.name = "__VNyanPluginButtonHolder";
+                canvasButtonHolder.transform.SetParent(canvasObject.transform);
+
+                GameObject canvasParameterHolder = DefaultControls.CreatePanel(uiResources);
+                canvasParameterHolder.name = "__VNyanParameterHolder";
+                canvasParameterHolder.transform.SetParent(canvasObject.transform);
+                canvasParameterHolder.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, 12, 468);
+                canvasParameterHolder.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Right, 12, 240);
+
+                GameObject stringParameterScroll = DefaultControls.CreateScrollView(uiResources);
+                stringParameterScroll.name = "__VNyanStringParameterScroll";
+                stringParameterScroll.transform.SetParent(canvasParameterHolder.transform);
+                stringParameterScroll.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, 12, 216);
+                stringParameterScroll.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, 12, 216);
+
+                GameObject floatParameterScroll = DefaultControls.CreateScrollView(uiResources);
+                floatParameterScroll.name = "__VNyanFloatParameterScroll";
+                floatParameterScroll.transform.SetParent(canvasParameterHolder.transform);
+                floatParameterScroll.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, 240, 216);
+                floatParameterScroll.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, 12, 216);
+
+            }
+            testCanvasObject = canvasObject;
+
+            harnessObject.AddComponent<VNyanTestHarness>();
+            testHarness = harnessObject.GetComponent<VNyanTestHarness>();
+            
         }
 
         public void setVNyanParameterFloat(string parameterName, float value)
@@ -169,34 +171,34 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
 
         }
 
-        //restore this behaviour when officially supported
-        /*
-        public string getVNyanDictionaryValue(string dictionaryName, string valueName)
+        public string getVNyanDictionaryValue(string dictionaryName, string keyName)
         {
-            try
+            //Debug.Log($"Getting Value { keyName } from Dictionary { dictionaryName }");
+            if (!(VNyanInterface.VNyanInterface.VNyanParameter == null))
             {
-                return ParamSystem.getInstance().GetDictionaryValue(dictionaryName, valueName);
-            } catch(Exception e)
-            {
-                Debug.LogWarning(e.Message);
-                return parameterSystem.GetDictionaryValue(dictionaryName, valueName);
+                return VNyanInterface.VNyanInterface.VNyanParameter.getVNyanDictionaryValue(dictionaryName, keyName);
             }
-            
+            return "";
+
         }
 
-        public void setVNyanDictionaryValue(string dictionaryName, string valueName, string newValue)
+        public void setVNyanDictionaryValue(string dictionaryName, string keyName, string value)
         {
-            try
+            //Debug.Log($"Setting Value { keyName } from Dictionary { dictionaryName } to { value }");
+            if (!(VNyanInterface.VNyanInterface.VNyanParameter == null))
             {
-                ParamSystem.getInstance().SetDictionaryValue(dictionaryName, valueName, newValue);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning(e.Message);
-                parameterSystem.SetDictionaryValue(dictionaryName, valueName, newValue);
+                VNyanInterface.VNyanInterface.VNyanParameter.setVNyanDictionaryValue(dictionaryName, keyName, value);
             }
         }
-        */
+
+        public void clearVNyanDictionary(string dictionaryName)
+        {
+            //Debug.Log($"Clearing Dictionary { dictionaryName }");
+            if (!(VNyanInterface.VNyanInterface.VNyanParameter == null))
+            {
+                VNyanInterface.VNyanInterface.VNyanParameter.clearVNyanDictionary(dictionaryName);
+            }
+        }
 
         public GameObject getAvatarObject()
         {
@@ -215,12 +217,12 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
             }
         }
 
-        public void callTrigger(string triggerName)
+        public void callTrigger(string triggerName, int value1, int value2, int value3, string text1, string text2, string text3)
         {
             //Debug.Log($"Trigger called: {triggerName}");
             if (!(VNyanInterface.VNyanInterface.VNyanTrigger == null))
             {
-                VNyanInterface.VNyanInterface.VNyanTrigger.callTrigger(triggerName);
+                VNyanInterface.VNyanInterface.VNyanTrigger.callTrigger(triggerName, value1, value2, value3, text1, text2, text3);
             }
         }
 

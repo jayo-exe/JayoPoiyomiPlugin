@@ -71,17 +71,23 @@ namespace JayoPoiyomiPlugin.VNyanPluginHelper
             return "";
         }
 
-        public string GetDictionaryValue(string dictionaryName, string valueName)
+        public string getVNyanDictionaryValue(string dictionaryName, string keyName)
         {
             if (!VNyanDictionaries.ContainsKey(dictionaryName)) return "";
-            if (!VNyanDictionaries[dictionaryName].ContainsKey(valueName)) return "";
-            return VNyanDictionaries[dictionaryName][valueName];
+            if (!VNyanDictionaries[dictionaryName].ContainsKey(keyName)) return "";
+            return VNyanDictionaries[dictionaryName][keyName];
         }
 
-        public void SetDictionaryValue(string dictionaryName, string valueName, string newValue)
+        public void setVNyanDictionaryValue(string dictionaryName, string keyName, string value)
         {
             if (!VNyanDictionaries.ContainsKey(dictionaryName)) VNyanDictionaries.Add(dictionaryName, new Dictionary<string,string>());
-            VNyanDictionaries[dictionaryName][valueName] = newValue;
+            VNyanDictionaries[dictionaryName][keyName] = value;
+        }
+
+        public void clearVNyanDictionary(string dictionaryName)
+        {
+            if (!VNyanDictionaries.ContainsKey(dictionaryName)) return;
+            VNyanDictionaries.Remove(dictionaryName);
         }
 
     }

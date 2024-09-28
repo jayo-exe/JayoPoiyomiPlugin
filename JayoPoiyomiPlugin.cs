@@ -78,15 +78,12 @@ namespace JayoPoiyomiPlugin
                 Debug.Log(e.ToString());
             }
 
-            //restore this behaviour when officially supported
-            /*
             HexToDec = Enumerable.Range(0, 256).ToDictionary( i => i.ToString("X2"), i => i.ToString());
             foreach(KeyValuePair<string,string> hex in HexToDec)
             {
                 _VNyanHelper.setVNyanDictionaryValue("HexToDec", hex.Key, hex.Value);
                 _VNyanHelper.setVNyanDictionaryValue("DecToHex", hex.Value, hex.Key);
             }
-            */
 
             // Hide the window by default
             if (window != null)
