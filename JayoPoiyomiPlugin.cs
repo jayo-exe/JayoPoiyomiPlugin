@@ -38,8 +38,9 @@ namespace JayoPoiyomiPlugin
         private GameObject propertyListFilter;
         private GameObject propertyListRefetch;
 
-        private string currentVersion = "v1.2.1";
+        private string currentVersion = "v1.3.0";
         private string repoName = "jayo-exe/JayoPoiyomiPlugin";
+        private string updateLink = "https://jayo-exe.itch.io/poi-plugin-for-vnyan";
 
         private void OnApplicationQuit()
         {
@@ -53,13 +54,13 @@ namespace JayoPoiyomiPlugin
             Debug.Log($"Poiyomi Plugin is Awake!");
             _VNyanHelper = new VNyanHelper();
 
-            updater = new VNyanPluginUpdater();
+            updater = new VNyanPluginUpdater(repoName, currentVersion, updateLink);
             updater.OpenUrlRequested += (url) => mainThread.Enqueue(() => { Application.OpenURL(url); });
 
             Debug.Log($"Loading Settings");
             // Load settings
             loadPluginSettings();
-            updater.CheckForUpdates(currentVersion, repoName);
+            updater.CheckForUpdates();
 
             Debug.Log($"Beginning Plugin Setup");
 
