@@ -37,6 +37,10 @@ namespace JayoPoiyomiPlugin
         private GameObject propertyListSearch;
         private GameObject propertyListFilter;
         private GameObject propertyListRefetch;
+        private GameObject pageOnePanel;
+        private GameObject pageOneButton;
+        private GameObject pageTwoPanel;
+        private GameObject pageTwoButton;
 
         private string currentVersion = "v1.3.0";
         private string repoName = "jayo-exe/JayoPoiyomiPlugin";
@@ -96,6 +100,10 @@ namespace JayoPoiyomiPlugin
                 propertyListRefetch = window.transform.Find("Panel/PropertiesPanel/RefetchButton").gameObject;
                 instructionsButton = window.transform.Find("Panel/InstructionsButton").gameObject;
                 instructionsTab = window.transform.Find("Panel/InstructionsPanel").gameObject;
+                pageOnePanel = window.transform.Find("Panel/InstructionsPanel/Page1").gameObject;
+                pageOneButton = window.transform.Find("Panel/InstructionsPanel/Page1/PageNumber/Button").gameObject;
+                pageTwoPanel = window.transform.Find("Panel/InstructionsPanel/Page2").gameObject;
+                pageTwoButton = window.transform.Find("Panel/InstructionsPanel/Page2/PageNumber/Button").gameObject;
                 window.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
                 window.SetActive(false);
 
@@ -114,19 +122,22 @@ namespace JayoPoiyomiPlugin
                     propertyListButton.GetComponent<Button>().onClick.AddListener(() => { tabToPropertyList(); });
                     instructionsButton.GetComponent<Button>().onClick.AddListener(() => { tabToInstructions(); });
                     propertyListRefetch.GetComponent<Button>().onClick.AddListener(() => { shaderManager.findPoiyomiMaterials(true); });
-
+                    pageOneButton.GetComponent<Button>().onClick.AddListener(() => { toInstructionsPageTwo(); });
+                    pageTwoButton.GetComponent<Button>().onClick.AddListener(() => { toInstructionsPageOne(); });
+                    
                     Dropdown filterDropdown = propertyListFilter.GetComponent<Dropdown>();
                     filterDropdown.onValueChanged.AddListener((v) => {
                         PropertiesList.TypeFilter = (v == 0) ? "" : filterDropdown.options[v].text;
-                        PropertiesList.RebuildList();
+                        PropertiesList.FilterList();
                     });
 
                     propertyListSearch.GetComponent<InputField>().onValueChanged.AddListener((v) => { 
                         PropertiesList.SearchTerm = v; 
-                        PropertiesList.RebuildList(); 
+                        PropertiesList.FilterList(); 
                     });
 
                     shaderManager.findPoiyomiMaterials();
+                    toInstructionsPageOne();
                     tabToPropertyList();
                 }
                 catch (Exception e)
@@ -142,8 +153,6 @@ namespace JayoPoiyomiPlugin
             PropertiesList.PropData = propData;
             PropertiesList.RebuildList();
         }
-
-
 
         public void loadPluginSettings()
         {
@@ -188,6 +197,18 @@ namespace JayoPoiyomiPlugin
             propertyListTab.SetActive(true);
             instructionsButton.GetComponent<Button>().interactable = true;
             propertyListButton.GetComponent<Button>().interactable = false;
+        }
+
+        public void toInstructionsPageOne()
+        {
+            pageTwoPanel.SetActive(false);
+            pageOnePanel.SetActive(true);
+        }
+
+        public void toInstructionsPageTwo()
+        {
+            pageTwoPanel.SetActive(true);
+            pageOnePanel.SetActive(false);
         }
 
     }

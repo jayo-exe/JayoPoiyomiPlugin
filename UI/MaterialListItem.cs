@@ -24,6 +24,23 @@ namespace JayoPoiyomiPlugin.UI
             ChildProperties = new List<GameObject>();
         }
 
+        public void OnDisable()
+        {
+            foreach (GameObject childProperty in ChildProperties)
+            {
+                childProperty.SetActive(false);
+            }
+        }
+
+        public void OnEnable()
+        {
+            foreach (GameObject childProperty in ChildProperties)
+            {
+                if (isCollapsed) continue;
+                childProperty.SetActive(true);
+            }
+        }
+
         public void PrepareUI(string matName)
         {
             materialName = matName;
@@ -62,6 +79,14 @@ namespace JayoPoiyomiPlugin.UI
             CollapseButtonObject.SetActive(true);
             ExpandButtonObject.SetActive(false);
             MaterialListExpanded.Invoke();
+        }
+
+        public void DestroyChildren()
+        {
+            foreach (GameObject childProperty in ChildProperties)
+            {
+                GameObject.Destroy(childProperty);
+            }
         }
     }
 }

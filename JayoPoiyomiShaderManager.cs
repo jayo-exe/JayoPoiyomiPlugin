@@ -67,7 +67,7 @@ namespace JayoPoiyomiPlugin
                 handleLegacyTriggers(triggerName);
                 return;
             }
-
+            // Debug.Log($"Trigger Details. name: {triggerName} | v1: {value1}, v2: {value2}, v3: {value3} | t1: {text1}, t2: {text2}, t3: {text3}");
             switch (triggerName)
             {
                 case "_xjp_refetch":
@@ -245,7 +245,7 @@ namespace JayoPoiyomiPlugin
 
         public void setPoiyomiFloat(string propName, float newValue, int lerpTime)
         {
-            //Debug.Log($"Setting Poiyomi Float Value for {propName} to {newValue} over {lerpTime}ms");
+            // Debug.Log($"Setting Poiyomi Float Value for {propName} to {newValue} over {lerpTime}ms");
             if (newValue == null) return;
             findPoiyomiMaterials();
             foreach (Material material in materials)
@@ -370,8 +370,9 @@ namespace JayoPoiyomiPlugin
             {
                 foreach (Material material in renderer.sharedMaterials)
                 {
-                    //Debug.Log($"Checking Material {material.name}");
+                    
                     if (material == null) continue;
+                    Debug.Log($"Checking Material {material.name}");
                     if (materials.Contains(material)) continue;
                     if (material.shader.name.StartsWith(".poiyomi/") || material.shader.name.StartsWith("Hidden/Locked/.poiyomi/"))
                     {

@@ -16,10 +16,12 @@ namespace JayoPoiyomiPlugin.UI
         public string TypeFilter = "";
 
         private List<string> CollapsedMaterials;
+        private Dictionary<string, GameObject> MaterialItems;
 
         public void Awake()
         {
             CollapsedMaterials = new List<string>();
+            MaterialItems = new Dictionary<string, GameObject>();
         }
 
         public void ClearList()
@@ -33,19 +35,34 @@ namespace JayoPoiyomiPlugin.UI
         }
         public void RebuildList()
         {
-            ClearList();
-            
+            Dictionary<string, ShaderPropertyListItem> materialsToAdd = new Dictionary<string, ShaderPropertyListItem>();
+            List<string> materialsToRemove = new List<string>(MaterialItems.Keys);
+
             foreach (KeyValuePair<string, ShaderPropertyListItem> materialItem in PropData)
+            {
+                materialsToRemove.Remove(materialItem.Key);
+                if (MaterialItems.ContainsKey(materialItem.Key)) continue;
+                materialsToAdd.Add(materialItem.Key, materialItem.Value);
+            }
+
+            foreach (string materialName in materialsToRemove)
+            {
+                MaterialItems[materialName].GetComponent<MaterialListItem>().DestroyChildren();
+                Destroy(MaterialItems[materialName]);
+                MaterialItems.Remove(materialName);
+            }
+
+            foreach (KeyValuePair<string, ShaderPropertyListItem> materialItem in materialsToAdd)
             {
                 bool addedMaterialItem = false;
                 GameObject matLabel = null;
 
-                foreach (KeyValuePair< string, ShaderPropertyDetails> propertyItem in materialItem.Value)
+                foreach (KeyValuePair<string, ShaderPropertyDetails> propertyItem in materialItem.Value)
                 {
                     if (SearchTerm != "" && !propertyItem.Value["name"].ToLowerInvariant().Contains(SearchTerm.ToLowerInvariant())) continue;
                     if (TypeFilter != "" && propertyItem.Value["type"] != TypeFilter) continue;
 
-                    if(!addedMaterialItem)
+                    if (!addedMaterialItem)
                     {
                         matLabel = GameObject.Instantiate(MaterialItemPrefab);
                         matLabel.transform.SetParent(transform);
@@ -54,16 +71,17 @@ namespace JayoPoiyomiPlugin.UI
                         materialListItem.MaterialListCollapsed += () => { CollapsedMaterials.Add(materialItem.Key); };
                         materialListItem.MaterialListExpanded += () => { CollapsedMaterials.Remove(materialItem.Key); };
                         addedMaterialItem = true;
+                        MaterialItems.Add(materialItem.Key, matLabel);
                     }
 
                     GameObject newLabel = GameObject.Instantiate(ListItemPrefab);
                     newLabel.transform.SetParent(transform);
                     newLabel.GetComponent<AnimatedPropertyListItem>().PrepareUI(propertyItem.Value["name"], propertyItem.Value["type"]);
-                    if(addedMaterialItem && matLabel != null)
+                    if (addedMaterialItem && matLabel != null)
                     {
                         matLabel.GetComponent<MaterialListItem>().ChildProperties.Add(newLabel);
                     }
-                    
+
                 }
 
                 if (CollapsedMaterials.Contains(materialItem.Key))
@@ -73,6 +91,24 @@ namespace JayoPoiyomiPlugin.UI
                 }
             }
 
+            FilterList();
+        }
+
+        public void FilterList()
+        {
+
+            foreach (KeyValuePair<string, ShaderPropertyListItem> materialItem in PropData)
+            {
+
+
+                foreach (KeyValuePair<string, ShaderPropertyDetails> propertyItem in materialItem.Value)
+                {
+                    bool itemMatch = true;
+                    if (SearchTerm != "" && !propertyItem.Value["name"].ToLowerInvariant().Contains(SearchTerm.ToLowerInvariant())) itemMatch = false;
+                    if (TypeFilter != "" && propertyItem.Value["type"] != TypeFilter) itemMatch = false;
+                    MaterialItems[materialItem.Key].SetActive(itemMatch);
+                }
+            }
         }
 
 
