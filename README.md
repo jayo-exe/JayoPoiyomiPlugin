@@ -6,7 +6,7 @@ A VNyan Plugin that allows you to control and change the values of animated prop
 1. [Installation](#installation)
 2. [Controlling Poiyomi Properties](#controlling-poiyomi-properties)
 3. [Usage](#usage)
-    2. [Inbound Triggers](#inbound-triggers)
+    1. [Inbound Triggers](#inbound-triggers)
         1. [Set Float Property](#set-float-property)
         2. [Set Int Property](#set-int-property)
         3. [Set Color Property](#set-color-property)
@@ -15,7 +15,7 @@ A VNyan Plugin that allows you to control and change the values of animated prop
         6. [Set Texture Property Scaling](#set-texture-property-scaling)
         7. [Set Texture Property Offset](#set-texture-property-offset)
 4. [Usage (Legacy)](#usage-legacy)
-    2. [Inbound Triggers (Legacy)](#inbound-triggers-legacy)
+    1. [Inbound Triggers (Legacy)](#inbound-triggers-legacy)
         1. [Set Float Property (Legacy)](#set-float-property-legacy)
         2. [Set Int Property (Legacy)](#set-int-property-legacy)
         3. [Set Color Property (Legacy)](#set-color-property-legacy)
@@ -129,7 +129,7 @@ Set the *Texture Scaling* of a Texture-type property matching the provided name 
 Set the *Texture Offset* of a Texture-type property matching the provided name to a Vector defined by the provided value *[x]*,*[y]*; optionally changing this gradually over a set amount of time
 
 
-##Usage (Legacy)
+## Usage (Legacy)
 
 The following details the old way of calling this plugin's triggers with specially-struictured trigger names.  This behaviour is included to avoid breaking any curent setups, but should be considered **deprecated** as it will be removed in a later version.
 
